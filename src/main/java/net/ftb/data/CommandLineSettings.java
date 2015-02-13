@@ -49,13 +49,21 @@ public class CommandLineSettings {
     @Getter
     private boolean mcLogs = false;
 
-    @Parameter(names = { "--no-console", "-c" }, description = "Do not open console window. (Overrides GUI option.)")
+    //@Parameter(names = { "--no-console", "-c" }, description = "Do not open console window. (Overrides GUI option.)")
     @Getter
     private boolean noConsole = false;
 
     @Parameter(names = { "--autostart", "-a" }, description = "Automatically start given pack (WIP feature)", arity = 1)
     @Getter
     private String packDir;
+
+    @Parameter(names = {"--user"}, description = "Username to use for authentication")
+    @Getter
+    private String username = null;
+
+    @Parameter(names = {"--mc-version"}, description = "Set MC versio")
+    @Getter
+    private String mcVersion = "1.7.10";
 
     @Parameter(names = { "--cache-dir", "-C" }, description = "Cache directory", arity = 1, validateWith = ValidateRequiredValue.class)
     @Getter
@@ -77,19 +85,19 @@ public class CommandLineSettings {
     @Getter
     private boolean help = false;
 
-    @Parameter(names = { "--disable-tray", "-t" }, description = "Disable tray icon")
+    //@Parameter(names = { "--disable-tray", "-t" }, description = "Disable tray icon")
     @Getter
     private boolean disableTray = false;
 
-    @Parameter(names = { "--skip-first", "-s" }, description = "Skip first time startup dialogue")
+    //@Parameter(names = { "--skip-first", "-s" }, description = "Skip first time startup dialogue")
     @Getter
     private boolean skipFirst = false;
 
-    @Parameter(names = {"--set-version"}, description = "Set version")
+    //@Parameter(names = {"--set-version"}, description = "Set version")
     @Getter
     private int manualVersion = 0;
 
-    @Parameter(names = {"--set-build"}, description = "Set build number")
+    //@Parameter(names = {"--set-build"}, description = "Set build number")
     @Getter
     private int manualBuildNumber = 0;
 

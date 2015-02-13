@@ -42,7 +42,7 @@ public class LoginWorker extends SwingWorker<String, Void> {
     }
 
     @Override
-    protected String doInBackground () {
+    public String doInBackground () {
         Benchmark.start("LoginWorker");
         try {
             if (Main.isAuthlibReadyToUse()) {

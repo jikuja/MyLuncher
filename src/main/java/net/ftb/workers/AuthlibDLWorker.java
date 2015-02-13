@@ -52,7 +52,7 @@ public class AuthlibDLWorker extends SwingWorker<Boolean, Void> {
     }
 
     @Override
-    protected Boolean doInBackground () {
+    public Boolean doInBackground () {
         Benchmark.start("Authlib");
         Logger.logDebug("Loading Authlib...");
         if (!binDir.exists()) {
@@ -70,7 +70,7 @@ public class AuthlibDLWorker extends SwingWorker<Boolean, Void> {
         return addToClasspath(binDir + File.separator + "authlib-" + authlibVersion + ".jar");
     }
 
-    protected boolean addToClasspath (String location) {
+    public boolean addToClasspath (String location) {
         File f = new File(location);
         try {
             if (f.exists()) {

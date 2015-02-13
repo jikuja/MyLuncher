@@ -85,7 +85,7 @@ public class MCInstaller {
                         prog.close();
                         if (get()) {
                             Logger.logInfo("Asset downloading complete");
-                            launchMinecraft(installPath, pack, RESPONSE, isLegacy);
+                            //launchMinecraft(installPath, pack, RESPONSE, isLegacy);
                         } else {
                             ErrorUtils.tossError("Error occurred during downloading the assets");
                         }
@@ -120,7 +120,7 @@ public class MCInstaller {
         } else if (assets == null) {
             Main.getEventBus().post(new EnableObjectsEvent());
         } else {
-            launchMinecraft(installPath, pack, RESPONSE, isLegacy);
+            //launchMinecraft(installPath, pack, RESPONSE, isLegacy);
         }
     }
 
@@ -324,148 +324,54 @@ public class MCInstaller {
         return null;
     }
 
-    public static void launchMinecraft (String installDir, ModPack pack, LoginResponse resp, boolean isLegacy) {
+    public static void launchMinecraft (String installDir, String packdir, String mcVer, LoginResponse resp, boolean isLegacy) {
         try {
-            File packDir = new File(installDir, pack.getDir());
-            String gameFolder = installDir + File.separator + pack.getDir() + File.separator + "minecraft";
+            File packDir = new File(installDir, packdir);
+            String gameFolder = installDir + File.separator + packdir + File.separator + "minecraft";
             File gameDir = new File(packDir, "minecraft");
             File assetDir = new File(installDir, "assets");
             File libDir = new File(installDir, "libraries");
             File natDir = new File(packDir, "natives");
-            final String packVer = Settings.getSettings().getPackVer(pack.getDir());
 
-            Logger.logInfo("Setting up native libraries for " + pack.getName() + " v " + packVer + " MC " + packmcversion);
-            if (!gameDir.exists()) {
-                gameDir.mkdirs();
-            }
+            Version base = JsonFactory.loadVersion(new File(installDir, "versions/{MC_VER}/{MC_VER}.json".replace("{MC_VER}", mcVer)));
 
-            if (natDir.exists()) {
-                natDir.delete();
-            }
-            natDir.mkdirs();
 
-            packmcversion = pack.getMcVersion(Settings.getSettings().getPackVer(pack.getDir()));
-            packbasejson = "";
-            if (new File(gameDir, "pack.json").exists()) {
-                Version packjson = JsonFactory.loadVersion(new File(gameDir, "pack.json"));
-                if (packjson.jar != null && !packjson.jar.isEmpty()) {
-                    packmcversion = packjson.jar; // is this needed or not?
-                }
-                if (packjson.inheritsFrom != null && !packjson.inheritsFrom.isEmpty()) {
-                    packbasejson = packjson.inheritsFrom;
-                }
-            }
-
-            if (packbasejson == null || packbasejson.isEmpty()) {
-                packbasejson = packmcversion;
-            }
-
-            Logger.logDebug("packbaseJSON " + packbasejson);
-            Version base = JsonFactory.loadVersion(new File(installDir, "versions/{MC_VER}/{MC_VER}.json".replace("{MC_VER}", packbasejson)));
-            byte[] buf = new byte[1024];
-            for (Library lib : base.getLibraries()) {
-                if (lib.natives != null) {
-                    File local = new File(libDir, lib.getPathNatives());
-                    ZipInputStream input = null;
-                    try {
-                        input = new ZipInputStream(new FileInputStream(local));
-                        ZipEntry entry = input.getNextEntry();
-                        while (entry != null) {
-                            String name = entry.getName();
-                            int n;
-                            if (lib.extract == null || !lib.extract.exclude(name)) {
-                                File output = new File(natDir, name);
-                                output.getParentFile().mkdirs();
-                                FileOutputStream out = new FileOutputStream(output);
-                                while ((n = input.read(buf, 0, 1024)) > -1) {
-                                    out.write(buf, 0, n);
-                                }
-                                out.close();
-                            }
-                            input.closeEntry();
-                            entry = input.getNextEntry();
-                        }
-                    } catch (Exception e) {
-                        ErrorUtils.tossError("Error extracting native libraries");
-                        Logger.logError("", e);
-                    } finally {
-                        try {
-                            input.close();
-                        } catch (IOException e) {
-                        }
-                    }
-                }
-            }
             List<File> classpath = Lists.newArrayList();
-            Version packjson = new Version();
+            Version packjson;
             if (new File(gameDir, "pack.json").exists()) {
                 packjson = JsonFactory.loadVersion(new File(gameDir, "pack.json"));
                 for (Library lib : packjson.getLibraries()) {
-                    //Logger.logError(new File(libDir, lib.getPath()).getAbsolutePath());
                     classpath.add(new File(libDir, lib.getPath()));
                 }
-                //}
             } else {
                 packjson = base;
             }
+
             if (!isLegacy) //we copy the jar to a new location for legacy
             {
-                classpath.add(new File(installDir, "versions/{MC_VER}/{MC_VER}.jar".replace("{MC_VER}", packmcversion)));
+                classpath.add(new File(installDir, "versions/{MC_VER}/{MC_VER}.jar".replace("{MC_VER}", mcVer)));
             } else {
-                FTBFileUtils.copyFile(new File(installDir, "versions/{MC_VER}/{MC_VER}.jar".replace("{MC_VER}", packmcversion)), new File(gameDir, "bin/" + Locations.OLDMCJARNAME));
-                FTBFileUtils.killMetaInf();
+                // no won't support yet?
+                //FTBFileUtils.copyFile(new File(installDir, "versions/{MC_VER}/{MC_VER}.jar".replace("{MC_VER}", packmcversion)), new File(gameDir, "bin/" + Locations.OLDMCJARNAME));
+                //FTBFileUtils.killMetaInf();
             }
+
             for (Library lib : base.getLibraries()) {
                 classpath.add(new File(libDir, lib.getPath()));
             }
 
             Process minecraftProcess = MCLauncher.launchMinecraft(Settings.getSettings().getJavaPath(), gameFolder, assetDir, natDir, classpath,
                     packjson.mainClass != null ? packjson.mainClass : base.mainClass, packjson.minecraftArguments != null ? packjson.minecraftArguments : base.minecraftArguments,
-                    packjson.assets != null ? packjson.assets : base.getAssets(), Settings.getSettings().getRamMax(), pack.getMaxPermSize(), pack.getMcVersion(packVer), resp.getAuth(), isLegacy);
-            LaunchFrame.MCRunning = true;
-            if (LaunchFrame.con != null) {
-                LaunchFrame.con.minecraftStarted();
-            }
+                    packjson.assets != null ? packjson.assets : base.getAssets(), Settings.getSettings().getRamMax(), "256", mcVer, resp.getAuth(), isLegacy);
+
             StreamLogger.prepare(minecraftProcess.getInputStream(), new LogEntry().level(LogLevel.UNKNOWN));
             String[] ignore = { "Session ID is token" };
             StreamLogger.setIgnore(ignore);
             StreamLogger.doStart();
-            String curVersion = (Settings.getSettings().getPackVer().equalsIgnoreCase("recommended version") ? pack.getVersion() : Settings.getSettings().getPackVer()).replace(".", "_");
-            TrackerUtils.sendPageView(ModPack.getSelectedPack().getName(), "Launched / " + ModPack.getSelectedPack().getName() + " / " + curVersion.replace('_', '.'));
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-            }
+
             try {
                 minecraftProcess.exitValue();
-            } catch (IllegalThreadStateException e) {
-                LaunchFrame.getInstance().setVisible(false);
-                LaunchFrame.setProcMonitor(ProcessMonitor.create(minecraftProcess, new Runnable() {
-                    @Override
-                    public void run () {
-                        if (!Settings.getSettings().getKeepLauncherOpen()) {
-                            System.exit(0);
-                        } else {
-                            if (LaunchFrame.con != null) {
-                                LaunchFrame.con.minecraftStopped();
-                            }
-                            LaunchFrame launchFrame = LaunchFrame.getInstance();
-                            launchFrame.setVisible(true);
-                            Main.getEventBus().post(new EnableObjectsEvent());
-                            try {
-                                Settings.getSettings().load(new FileInputStream(Settings.getSettings().getConfigFile()));
-                                LaunchFrame.getInstance().tabbedPane.remove(1);
-                                LaunchFrame.getInstance().optionsPane = new OptionsPane(Settings.getSettings());
-                                LaunchFrame.getInstance().tabbedPane.add(LaunchFrame.getInstance().optionsPane, 1);
-                                LaunchFrame.getInstance().tabbedPane.setIconAt(1, LauncherStyle.getCurrentStyle().filterHeaderIcon(this.getClass().getResource("/image/tabs/options.png")));
-                            } catch (Exception e1) {
-                                Logger.logError("Failed to reload settings after launcher closed", e1);
-                            }
-                        }
-                        LaunchFrame.MCRunning = false;
-                    }
-                }));
-            }
+            } catch (IllegalThreadStateException e) { }
         } catch (Exception e) {
             Logger.logError("Error while running launchMinecraft()", e);
         }

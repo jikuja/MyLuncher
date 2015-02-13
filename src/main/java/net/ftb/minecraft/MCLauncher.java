@@ -81,7 +81,7 @@ public class MCLauncher {
         List<String> arguments = Lists.newArrayList();
 
         Logger.logInfo("Java Path: " + javaPath);
-        Logger.logInfo("Pack: " + ModPack.getSelectedPack().getName() + " " + version);
+        //Logger.logInfo("Pack: " + ModPack.getSelectedPack().getName() + " " + version);
         arguments.add(javaPath);
 
         setMemory(arguments, rmax);

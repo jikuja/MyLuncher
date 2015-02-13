@@ -59,8 +59,8 @@ public class PlayOfflineDialog extends JDialog {
                 } else {
                     unique = uuid;
                 }
-                MCInstaller.launchMinecraft(Settings.getSettings().getInstallPath(), ModPack.getSelectedPack(),
-                        new LoginResponse("1", "token", username, "offlinemods", unique, resp.getAuth()), legacy);
+                //MCInstaller.launchMinecraft(Settings.getSettings().getInstallPath(), ModPack.getSelectedPack(),
+                //        new LoginResponse("1", "token", username, "offlinemods", unique, resp.getAuth()), legacy);
 
             }
         });
