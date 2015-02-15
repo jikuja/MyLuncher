@@ -23,6 +23,8 @@ limitations under the License.
 1. compile with gradle `./gradlew --daemon shadowrun`
 2. run e.g. `java -jar build/libs/MyLuncher-0.1.jar --user <your email/username> -a FTBLite2 --mc-version "1.6.4" --log-mc`
 or `java -jar build/libs/MyLuncher-0.1.jar --user <your email/username> -a FTBLite3`
+3. How to use credentials from Vanilla launcher
+   * e.g. `java -jar  build/libs/MyLuncher-0.0.1.jar --vanilla-credentials --user <your email/username> -a FTBLite3`
 
 ## Missing features
 * No legacy pack support

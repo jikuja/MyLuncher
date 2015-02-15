@@ -57,7 +57,7 @@ dependencies {
 
 
 description = "MyLuncher"
-version = '0.0.1'
+version = '0.0.2'
 group = 'com.github.jikuja'
 sourceCompatibility = 1.6
 targetCompatibility = 1.6

@@ -362,7 +362,7 @@ public class MCInstaller {
 
             Process minecraftProcess = MCLauncher.launchMinecraft(Settings.getSettings().getJavaPath(), gameFolder, assetDir, natDir, classpath,
                     packjson.mainClass != null ? packjson.mainClass : base.mainClass, packjson.minecraftArguments != null ? packjson.minecraftArguments : base.minecraftArguments,
-                    packjson.assets != null ? packjson.assets : base.getAssets(), Settings.getSettings().getRamMax(), "256", mcVer, resp.getAuth(), isLegacy);
+                    packjson.assets != null ? packjson.assets : base.getAssets(), Settings.getSettings().getRamMax(), "256M", mcVer, resp.getAuth(), isLegacy);
 
             StreamLogger.prepare(minecraftProcess.getInputStream(), new LogEntry().level(LogLevel.UNKNOWN));
             String[] ignore = { "Session ID is token" };

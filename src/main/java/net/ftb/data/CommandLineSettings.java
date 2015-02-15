@@ -65,6 +65,14 @@ public class CommandLineSettings {
     @Getter
     private String mcVersion = "1.7.10";
 
+    @Parameter(names = {"--vanilla-credentials"}, description = "Use credentials from vanilla launcher")
+    @Getter
+    private boolean vanillaCredential = false;
+
+    @Parameter(names = {"--dry-run"}, description = "Do not auth")
+    @Getter
+    private boolean dryRun = false;
+
     @Parameter(names = { "--cache-dir", "-C" }, description = "Cache directory", arity = 1, validateWith = ValidateRequiredValue.class)
     @Getter
     private String cacheDir;
